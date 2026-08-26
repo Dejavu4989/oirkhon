@@ -53,13 +53,17 @@ def load_proper_nouns():
 
 
 def is_citation_form(lemma: str, morph, freq) -> bool:
-    """Reject unmerged inflected forms (томилж, олов, ялгалын …)."""
+    """Reject unmerged inflected forms (ажлынхаа, хуулиас, томилж …).
+
+    Strict mode: ANY derivation to an equally-or-more frequent known word
+    disqualifies — daily answers must be terminal citation forms.
+    """
     cands = morph.all_candidates(lemma)
     derived = [l for l in cands if l != lemma]
     if not derived:
         return True
     best = max(derived, key=lambda l: freq.get(l, 0))
-    return freq.get(best, 0) < config.REDUCE_MERGE_MARGIN * max(freq.get(lemma, 0), 1)
+    return freq.get(best, 0) < max(freq.get(lemma, 0), 1)
 
 
 def generate(max_candidates: int = 2000, seed: int = 20260101):

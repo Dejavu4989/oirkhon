@@ -60,7 +60,8 @@ def guess_pos(lemma: str) -> str:
     return "noun"
 
 
-def load_lemmas(path: Path) -> tuple[list[str], dict[str, int]]:
+def load_lemmas(path) -> tuple[list[str], dict[str, int]]:
+    path = Path(path)
     lemmas: list[str] = []
     freq: dict[str, int] = {}
     with path.open("r", encoding="utf-8") as fh:
