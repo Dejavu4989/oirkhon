@@ -27,17 +27,21 @@ _BAD_ENDINGS = ("ж", "лаа", "лээ", "лоо", "лөө", "сан", "сэн"
                 "даг", "дэг", "дог", "на", "нэ", "но", "нө",
                 "ын", "ийн", "ны", "ыг", "ийг", "д", "т",
                 "аас", "ээс", "оос", "өөс", "аар", "ээр", "оор", "өөр",
-                "тай", "тэй", "той", "хаа", "хээ", "ууд", "үүд")
+                "тай", "тэй", "той", "хаа", "хээ", "ууд", "үүд",
+                "жээ", "в")   # finite-past / reported-speech leftovers
+MIN_ANSWER_FREQ = 60          # concrete/common words only
 
 
 def _answer_pool() -> set[str]:
     """Nouns from the vocab that look like citable concrete answers."""
-    lemmas, _freq = load_lemmas(config.VOCAB_DIR / "lemmas.tsv")
+    lemmas, freq = load_lemmas(config.VOCAB_DIR / "lemmas.tsv")
     pool = set()
     for lemma in lemmas:
         if not config.ANSWER_MIN_LEN <= len(lemma) <= config.ANSWER_MAX_LEN:
             continue
         if any(lemma.endswith(e) for e in _BAD_ENDINGS):
+            continue
+        if freq.get(lemma, 0) < MIN_ANSWER_FREQ:
             continue
         pool.add(lemma)
     return pool

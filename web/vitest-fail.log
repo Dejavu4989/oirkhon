@@ -1,0 +1,159 @@
+﻿npx : [33mThe CJS build of Vite's Node API is deprecated. See 
+https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+At line:1 char:1
++ npx vitest run lib/__tests__/actions.test.ts 2>&1 | Out-File -Encodin ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mThe CJS bu...e details.[39m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/tuguldur.t/workspace/other/oirkhon/web[39m
+
+[2m4:37:11 PM[22m [33m[1m[vite][22m[39m [33m[2m(ssr)[22m[39m [33mwarning: [33mThe "??" operator here will 
+always return the left operand[33m
+80 |        if (Math.abs(surf.length - w.length) > 1) continue;
+81 |        const d = weightedDistance(w, surf);
+82 |        if (d <= 1.0) hits.push({ d, negFreq: -this.freq.get(surf) ?? 0, surf, lemma });
+   |                                                                   ^
+83 |      }
+84 |      if (!hits.length) return { status: "unknown", matched: null, lemma: null, message: null };
+[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36mC:/Users/tuguldur.t/workspace/other/oirkhon/web/lib/lexicon.ts[39m
+ [31mΓ¥»[39m lib/__tests__/actions.test.ts [2m([22m[2m17 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 91[2mms[22m[39m
+   [32mΓ£ô[39m ubDate[2m > [22mrolls at 00:00 Ulaanbaatar [LOCKED][32m 18[2mms[22m[39m
+   [32mΓ£ô[39m todayPayload[2m > [22mhides the answer before solve [LOCKED][32m 2[2mms[22m[39m
+   [32mΓ£ô[39m todayPayload[2m > [22m404 before epoch[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m guessAction[2m > [22mok guess returns rank + bucket, no answer[32m 3[2mms[22m[39m
+[31m   [31m├ù[31m guessAction[2m > [22minflected form of the answer counts as solved and reveals answer[39m[32m 6[2mms[22m[39m
+[31m     ΓåÆ expected undefined to be true // Object.is equality[39m
+[31m   [31m├ù[31m guessAction[2m > [22mduplicate does not increment counter[39m[32m 4[2mms[22m[39m
+[31m     ΓåÆ expected 'unknown_word' to be 'duplicate' // Object.is equality[39m
+   [32mΓ£ô[39m guessAction[2m > [22munknown word -> 422[32m 1[2mms[22m[39m
+[31m   [31m├ù[31m guessAction[2m > [22mcorrected typo flags status corrected[39m[32m 2[2mms[22m[39m
+[31m     ΓåÆ expected 'duplicate' to be 'corrected' // Object.is equality[39m
+   [32mΓ£ô[39m guessAction[2m > [22mrate limit: 31st guess in a minute -> 429[32m 19[2mms[22m[39m
+[31m   [31m├ù[31m guessAction[2m > [22mguess history survives refresh via store[39m[32m 6[2mms[22m[39m
+[31m     ΓåÆ expected [ ΓÇª(2) ] to have a length of 1 but got 2[39m
+   [32mΓ£ô[39m hintAction[2m > [22mletter_count reveals length only[32m 2[2mms[22m[39m
+   [32mΓ£ô[39m hintAction[2m > [22mfirst_letter reveals one letter[32m 2[2mms[22m[39m
+   [32mΓ£ô[39m hintAction[2m > [22mnearby_word walks ranks 10..50, skipping guessed[32m 6[2mms[22m[39m
+   [32mΓ£ô[39m hintAction[2m > [22m402 after three free hints[32m 3[2mms[22m[39m
+   [32mΓ£ô[39m giveupAction[2m > [22m409 before 20 guesses[32m 1[2mms[22m[39m
+[31m   [31m├ù[31m giveupAction[2m > [22mafter 20 guesses reveals answer + top10 nearest[39m[32m 14[2mms[22m[39m
+[31m     ΓåÆ expected 409 to be 200 // Object.is equality[39m
+   [32mΓ£ô[39m findPuzzle[2m > [22mfinds by exact date[32m 0[2mms[22m[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m Failed Tests 5 [49m[22m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m lib/__tests__/actions.test.ts[2m > [22mguessAction[2m > [22minflected form of the answer 
+counts as solved and reveals answer
+[31m[1mAssertionError[22m: expected undefined to be true // Object.is equality[39m
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2mΓ¥»[22m lib/__tests__/actions.test.ts:[2m72:27[22m[39m
+    [90m 70| [39m    [34msetExport[39m(exp)[33m;[39m
+    [90m 71| [39m    const r = guessAction({ token: undefined, ip: "1", word: "╨╝╨╛╤Ç╨╕╨│╨╛╨╛"ΓÇª
+    [90m 72| [39m    
+[34mexpect[39m(r[33m.[39mbody[33m.[39msolved)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                          [31m^[39m
+    [90m 73| [39m    
+[34mexpect[39m(r[33m.[39mbody[33m.[39manswer)[33m.[39m[34mtoBe[39m([32m"╨╝╨╛╤Ç╤î"[39m)[33m;[39m
+    [90m 74| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m lib/__tests__/actions.test.ts[2m > [22mguessAction[2m > [22mduplicate does not increment 
+counter
+[31m[1mAssertionError[22m: expected 'unknown_word' to be 'duplicate' // Object.is equality[39m
+
+Expected: [32m"duplicate"[39m
+Received: [31m"unknown_word"[39m
+
+[36m [2mΓ¥»[22m lib/__tests__/actions.test.ts:[2m79:27[22m[39m
+    [90m 77| [39m    const a = guessAction({ token: "t1", ip: "1", word: "╨╜╨╛╨╝", now: NOΓÇª
+    [90m 78| [39m    const b = guessAction({ token: a.sessionToken, ip: "1", word: "╨╜╨╛╨╝ΓÇª
+    [90m 79| [39m    
+[34mexpect[39m(b[33m.[39mbody[33m.[39mstatus)[33m.[39m[34mtoBe[39m([32m"duplicate"[39m)[33m;[39m
+    [90m   | [39m                          [31m^[39m
+    [90m 80| [39m    
+[34mexpect[39m(b[33m.[39mbody[33m.[39mguesses_count)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m 81| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m lib/__tests__/actions.test.ts[2m > [22mguessAction[2m > [22mcorrected typo flags status 
+corrected
+[31m[1mAssertionError[22m: expected 'duplicate' to be 'corrected' // Object.is equality[39m
+
+Expected: [32m"[7mcorrec[27mte[7md[27m"[39m
+Received: [31m"[7mduplica[27mte"[39m
+
+[36m [2mΓ¥»[22m lib/__tests__/actions.test.ts:[2m95:27[22m[39m
+    [90m 93| [39m    const r = guessAction({ token: undefined, ip: "1", word: "╨╜╨╛╤à╨╛╨╕", ΓÇª
+    [90m 94| [39m    [34mexpect[39m(r[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)[33m;[39m
+    [90m 95| [39m    
+[34mexpect[39m(r[33m.[39mbody[33m.[39mstatus)[33m.[39m[34mtoBe[39m([32m"corrected"[39m)[33m;[39m
+    [90m   | [39m                          [31m^[39m
+    [90m 96| [39m    
+[34mexpect[39m(r[33m.[39mbody[33m.[39mcorrection)[33m.[39m[34mtoContain[39m([32m"╨│╤ì╨╢ 
+╨╛╨╣╨╗╨│╨╛╨╗╨╛╨╛"[39m)[33m;[39m
+    [90m 97| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m lib/__tests__/actions.test.ts[2m > [22mguessAction[2m > [22mguess history survives 
+refresh via store
+[31m[1mAssertionError[22m: expected [ ΓÇª(2) ] to have a length of 1 but got 2[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2mΓ¥»[22m lib/__tests__/actions.test.ts:[2m110:33[22m[39m
+    [90m108| [39m    const first = guessAction({ token: undefined, ip: "1", word: "╨╜╨╛╨╝"ΓÇª
+    [90m109| [39m    [35mconst[39m today [33m=[39m 
+[34mtodayPayload[39m(first[33m.[39msessionToken[33m,[39m [33mNOW[39m)[33m;[39m
+    [90m110| [39m    [34mexpect[39m(today[33m.[39mbody[33m![39m[33m.[39mguesses)[33m.[39m[34mtoHaveLength
+[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                                [31m^[39m
+    [90m111| [39m    [34mexpect[39m(today[33m.[39mbody[33m![39m[33m.[39mguesses[[34m0[39m][33m.[39mword)
+[33m.[39m[34mtoBe[39m([32m"╨╜╨╛╨╝"[39m)[33m;[39m
+    [90m112| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m lib/__tests__/actions.test.ts[2m > [22mgiveupAction[2m > [22mafter 20 guesses reveals 
+answer + top10 nearest
+[31m[1mAssertionError[22m: expected 409 to be 200 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 200[39m
+[31m+ 409[39m
+
+[36m [2mΓ¥»[22m lib/__tests__/actions.test.ts:[2m161:22[22m[39m
+    [90m159| [39m    }
+    [90m160| [39m    [35mconst[39m r [33m=[39m [34mgiveupAction[39m(token[33m,[39m [33mNOW[39m)[33m;[39m
+    [90m161| [39m    [34mexpect[39m(r[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)[33m;[39m
+    [90m   | [39m                     [31m^[39m
+    [90m162| [39m    
+[34mexpect[39m(r[33m.[39mbody[33m.[39manswer)[33m.[39m[34mtoBe[39m([32m"╨╝╨╛╤Ç╤î"[39m)[33m;[39m
+    [90m163| [39m    expect(r.body.nearest).toHaveLength(3); // fixture has 3 non-answeΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/5]ΓÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m12 passed[39m[22m[90m (17)[39m
+[2m   Start at [22m 16:37:10
+[2m   Duration [22m 808ms[2m (transform 100ms, setup 0ms, collect 130ms, tests 91ms, environment 0ms, prepare 129ms)[22m
+
