@@ -5,8 +5,11 @@ __pycache__/
 .venv/
 venv/
 
-# Pipeline data artifacts (never commit corpora/vectors)
-data/
+# Pipeline data artifacts: corpora/models stay local (re-downloadable),
+# but vocab + trained vectors travel with the repo so other machines work.
+data/*
+!data/vocab
+!data/vectors
 
 # Environment
 .env
@@ -20,3 +23,6 @@ out/
 # OS
 Thumbs.db
 .DS_Store
+
+# local session artifact
+session.json

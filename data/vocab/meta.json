@@ -1,0 +1,9 @@
+{
+  "distinct_tokens": 300978,
+  "kept_forms": 39965,
+  "lemmas": 22396,
+  "merged_forms": 17662,
+  "top": 40000,
+  "min_form_freq": 5,
+  "merge_margin": 1.3
+}
