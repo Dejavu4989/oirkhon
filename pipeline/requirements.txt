@@ -1,0 +1,8 @@
+# Core pipeline (Phase 0 morphology/vocab/corpus) is stdlib-only.
+# The extras below are needed only for embeddings, ranks and DB writes.
+
+numpy>=1.26
+gensim>=4.3            # fastText cc.mn.300 loading
+sentence-transformers>=3.0   # pulls torch; used for e5-large and LaBSE
+psycopg2-binary>=2.9
+redis>=5.0

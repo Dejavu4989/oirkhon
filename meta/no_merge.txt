@@ -1,0 +1,6 @@
+# Forms that must NOT be merged into a shorter lemma during vocab reduction.
+# One form per line; '#' starts a comment.
+# Reason: frequency margins cannot tell distinct words apart when one is
+# much more common (бага 'small' vs багана 'pole').
+багана
+эмээ

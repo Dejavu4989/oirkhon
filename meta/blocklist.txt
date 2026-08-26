@@ -1,0 +1,6 @@
+# Words excluded from answer-candidate generation (spec §3.8).
+# One item per line. Seed with profanity/offensive terms; extend after review.
+# NOTE: this starter list is intentionally minimal — a native-speaker pass
+# over answer_candidates.csv output happens in the admin panel anyway.
+гомо
+бүдүүлэг

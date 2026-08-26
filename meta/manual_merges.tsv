@@ -1,0 +1,5 @@
+# Curated form -> lemma overrides. One 'form<TAB>lemma' pair per line.
+# Applied during `python -m pipeline.forms`; dictionary lookups win over
+# rules at guess time, so these take effect immediately.
+мориноор	морь
+моригоо	морь

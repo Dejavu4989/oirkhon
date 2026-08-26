@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Pipeline data artifacts (never commit corpora/vectors)
+data/
+
+# Environment
+.env
+.env.*
+
+# Node / Next.js (later phases)
+node_modules/
+.next/
+out/
+
+# OS
+Thumbs.db
+.DS_Store

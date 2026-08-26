@@ -1,0 +1,8 @@
+[project]
+name = "oirkhon-pipeline"
+version = "0.1.0"
+description = "Phase 0 language pipeline for the Oirkhon daily word-game platform"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["pipeline*"]
