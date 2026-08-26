@@ -4,10 +4,9 @@ Daily semantic-proximity game («Ойрхон»): one secret Mongolian word per 
 guesses return server-side ranks (1 = the answer). Built for multiple games on
 one platform (Ойрхон → Үсэглэл → Хаана вэ?).
 
-**Status: Phase 0 built; preliminary quality gate run. fastText cc.mn.300
-passes ~18/20 gate words (my read — native-speaker sign-off pending, see
-`data/reports/gate_fasttext.txt`). e5-large (~11/20) and LaBSE (~14/20)
-evaluated and rejected for isolated-word Mongolian. Web app still not started.**
+**Status: Phase 0 COMPLETE — quality gate PASSED 18/20 on 2026-08-26
+(fastText cc.mn.300; `ус` and `нар` rejected, see meta/GATE_VERDICT.md).
+Web app build is next (spec §11 steps 3–9).**
 
 ## Repository layout
 

@@ -4,3 +4,7 @@
 # over answer_candidates.csv output happens in the admin panel anyway.
 гомо
 бүдүүлэг
+
+# Quality-gate rejections (2026-08-26): neighbor lists unusable as answers
+ус
+нар
