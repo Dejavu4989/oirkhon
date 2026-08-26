@@ -8,3 +8,28 @@
 # Quality-gate rejections (2026-08-26): neighbor lists unusable as answers
 ус
 нар
+
+# Weak/draft swaps (owner review): names, participles, obscure titles
+баатарсүх
+шаньюй
+сайгүй
+овогтон
+сэнгээ
+шагдар
+настан
+гэвч
+хэлэлцэн
+ханган
+магтан
+магадлан
+өгөөгүй
+тавин
+ингэх
+шугуй
+анхбаяр
+догсом
+богинохон
+онцгойлон
+талаархи
+завсар
+жамбал

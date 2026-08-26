@@ -29,7 +29,7 @@ _BAD_ENDINGS = ("ж", "лаа", "лээ", "лоо", "лөө", "сан", "сэн"
                 "аас", "ээс", "оос", "өөс", "аар", "ээр", "оор", "өөр",
                 "тай", "тэй", "той", "хаа", "хээ", "ууд", "үүд",
                 "жээ", "в")   # finite-past / reported-speech leftovers
-MIN_ANSWER_FREQ = 60          # concrete/common words only
+MIN_ANSWER_FREQ = 120         # concrete/common words only
 
 
 def _answer_pool() -> set[str]:
