@@ -31,6 +31,11 @@ _BAD_ENDINGS = ("ж", "лаа", "лээ", "лоо", "лөө", "сан", "сэн"
                 "жээ", "в")   # finite-past / reported-speech leftovers
 MIN_ANSWER_FREQ = 120         # concrete/common words only
 
+# Clearly-verbal endings only — broader patterns (-в/-ан/-эн) also fit real
+# nouns (хандив, үймээн, унаган) and belong in meta/blocklist.txt instead.
+BAD_TAILS = ("сан", "сэн", "сон", "сөн", "жээ", "лаа", "лээ", "лоо", "лөө",
+             "даг", "дэг", "дог", "чихсэн")
+
 
 def _answer_pool() -> set[str]:
     """Nouns from the vocab that look like citable concrete answers."""
@@ -59,6 +64,13 @@ def load_candidates():
         r["frequency"] = int(r["frequency"])
         buckets[r["difficulty"]].append(r)
     return buckets
+
+
+def _load_schedule_csv():
+    path = config.META_DIR / "draft_schedule_30d.csv"
+    if not path.exists():
+        raise SystemExit("no draft schedule to swap — run without --swap first")
+    return list(csv.DictReader(path.open("r", encoding="utf-8")))
 
 
 def pick(buckets: dict[str, list[dict]], difficulty: str, rng: random.Random):
@@ -128,13 +140,103 @@ def build(days: int, epoch: dt.date, seed: int = 20260901):
     return rows
 
 
+def swap_blocked(seed: int = 20260826):
+    """Replace ONLY rows whose lemma is now blocklisted/ineligible.
+
+    Every other row stays untouched — no reshuffle. This is the admin loop:
+    add bad words to meta/blocklist.txt, run `python -m pipeline.schedule --swap`.
+    """
+    from .candidates import load_blocklist, load_proper_nouns, is_citation_form
+    from .morphology import Morphology
+    from .vocab import load_lemmas
+
+    config.ensure_dirs()
+    blocked = load_blocklist()
+    lemmas, freq = load_lemmas(config.VOCAB_DIR / "lemmas.tsv")
+    morph = Morphology(vocab=set(lemmas), freq=freq)
+    proper = load_proper_nouns()
+
+    def eligible(l: str) -> bool:
+        if l in blocked or "-" in l or l.lower() in proper:
+            return False
+        if any(l.endswith(e) for e in BAD_TAILS):
+            return False
+        if not (config.ANSWER_MIN_LEN <= len(l) <= config.ANSWER_MAX_LEN):
+            return False
+        if freq.get(l, 0) < MIN_ANSWER_FREQ:
+            return False
+        return is_citation_form(l, morph, freq)
+
+    pool = [l for idx, l in enumerate(lemmas, start=1)
+            if idx <= 15000 and eligible(l)]
+    rng = random.Random(seed)
+
+    out_csv = config.META_DIR / "draft_schedule_30d.csv"
+    rows = _load_schedule_csv()
+    swapped = []
+    taken = {r["lemma"] for r in rows}
+    for r in rows:
+        if eligible(r["lemma"]):
+            continue
+        old = r["lemma"]
+        new = rng.choice(pool)
+        while new in taken:
+            new = rng.choice(pool)
+        r["lemma"] = new
+        taken.add(new)
+        swapped.append((r["puzzle_number"], old, new))
+
+    with out_csv.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(
+            fh, fieldnames=["puzzle_number", "play_date", "lemma", "difficulty"])
+        writer.writeheader()
+        writer.writerows(rows)
+
+    sql_path = write_seed_sql(rows)
+    for n, old, new in swapped:
+        print(f"[swap] #{n}: {old} -> {new}")
+    print(f"[swap] {len(swapped)} swapped; seed SQL -> {sql_path}")
+    return rows
+
+
+def write_seed_sql(rows: list[dict]) -> Path:
+    sql_path = Path(__file__).resolve().parent.parent / "db" / "seed" / "draft_puzzles.sql"
+    sql_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "-- DRAFT puzzle schedule — requires admin approval before publishing.",
+        "-- Idempotent: re-running replaces unpublished drafts only.",
+        "WITH game AS (SELECT id FROM games WHERE slug = 'oirkhon')",
+    ]
+    values = ",\n".join(
+        f"  ({r['puzzle_number']}, DATE '{r['play_date']}', '{r['lemma']}', "
+        f"'{r['difficulty']}')" for r in rows)
+    lines.append(
+        "INSERT INTO puzzles (game_id, puzzle_number, play_date, answer_lemma_id, published)\n"
+        "SELECT g.id, v.puzzle_number, v.play_date, l.id, FALSE\n"
+        "FROM (VALUES\n" + values + "\n"
+        ") AS v(puzzle_number, play_date, lemma, difficulty)\n"
+        "JOIN game g ON TRUE\n"
+        "JOIN lemmas l ON l.lemma = v.lemma\n"
+        "WHERE NOT EXISTS (\n"
+        "  SELECT 1 FROM puzzles p\n"
+        "  WHERE p.game_id = g.id AND p.puzzle_number = v.puzzle_number\n"
+        ");")
+    sql_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return sql_path
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--days", type=int, default=30)
     ap.add_argument("--epoch", default="2026-09-01",
                     help="day 1 of the game; puzzle_number = days_since_epoch + 1")
+    ap.add_argument("--swap", action="store_true",
+                    help="keep existing schedule; replace only blocklisted words")
     args = ap.parse_args()
-    build(args.days, dt.date.fromisoformat(args.epoch))
+    if args.swap:
+        swap_blocked()
+    else:
+        build(args.days, dt.date.fromisoformat(args.epoch))
 
 
 if __name__ == "__main__":
