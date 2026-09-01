@@ -28,6 +28,20 @@ export function progressFill(rank: number, vocabSize: number): number {
   return Math.max(0, Math.min(1, 1 - Math.log(r) / Math.log(v)));
 }
 
+/**
+ * Width of a guess bar, 0..1 — presentation only.
+ *
+ * Exponential falloff rather than the log curve of `progressFill`: it keeps the
+ * closest guesses near full width and collapses distant ones to a sliver, which
+ * is what makes the board readable at a glance. `progressFill` stays the shared
+ * value mirrored in pipeline/gameutil.py and used by the API.
+ */
+export function barWidth(rank: number, vocabSize: number): number {
+  const tau = Math.max(vocabSize, 64) / 32;
+  const w = 0.92 * Math.exp(-(Math.max(rank, 1) - 1) / tau);
+  return Math.max(0.012, Math.min(0.92, w));
+}
+
 export function bestProgression(ranks: number[]): string[] {
   const squares: string[] = [];
   let best = Number.MAX_SAFE_INTEGER;

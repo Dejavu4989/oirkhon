@@ -11,7 +11,7 @@ export interface ScheduleEntry {
   difficulty: string;
 }
 
-interface ExportShape {
+export interface ExportShape {
   schedule: ScheduleEntry[];
   lemmas: [string, number][];
   forms: Record<string, string>;

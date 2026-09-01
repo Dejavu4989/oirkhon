@@ -120,6 +120,9 @@ CREATE TABLE IF NOT EXISTS guesses (
     UNIQUE (play_id, lemma_id)
 );
 
+-- Only 'nearby_word' is produced now: a hint reveals a word ranked closer than
+-- the player's best guess. 'letter_count'/'first_letter' are kept in the CHECK
+-- for rows written before that change.
 CREATE TABLE IF NOT EXISTS hints (
     id         BIGSERIAL PRIMARY KEY,
     play_id    BIGINT NOT NULL REFERENCES plays(id),

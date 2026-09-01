@@ -11,9 +11,10 @@ data/*
 !data/vocab
 !data/vectors
 
-# Environment
+# Environment (the committed template is the one exception)
 .env
 .env.*
+!.env.example
 
 # Node / Next.js (later phases)
 node_modules/

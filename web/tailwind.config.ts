@@ -1,16 +1,20 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        bg: "var(--bg)",
+        rail: "var(--bg-rail)",
+        surface: "var(--surface)",
+        surface2: "var(--surface-2)",
+        line: "var(--border)",
+        ink: "var(--text)",
+        muted: "var(--muted)",
+        hot: "var(--hot)",
+        warm: "var(--warm)",
+        cold: "var(--cold)",
       },
     },
   },

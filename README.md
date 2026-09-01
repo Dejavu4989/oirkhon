@@ -70,7 +70,8 @@ python -m pipeline.inspect морь --vectors data/vectors/fasttext_mn.npz data/
 3. Schema + migrations + rank job + 30 days of approved answers (schema SQL ready)
 4. API routes with tests
 5. Game UI, anonymous play, share text
-6. Auth + streaks + archive paywall
+6. Auth + streaks + archive paywall ✅ (email + Google sign-in, subscriber archive
+   and extra hints; `db/migrations/002_auth.sql`, `db/README.md`)
 7. QPay integration
 8. Admin panel
 9. SEO

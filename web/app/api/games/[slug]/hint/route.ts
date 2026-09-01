@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hintAction } from "@/lib/actions";
-import { ensureToken } from "../_util";
+import { ensureToken, puzzleParam, requestCtx } from "../_util";
 
+// The hint takes no arguments beyond which puzzle: there is a single kind, and
+// what it reveals is derived from how close the player already is.
 export async function POST(req: NextRequest) {
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "body шаардлагатай" }, { status: 400 });
-  }
-  const type = (body as { type?: unknown })?.type;
-  const result = hintAction(type, req.cookies.get("oirkhon_token")?.value);
+  const body = await req.json().catch(() => ({}));
+  const result = hintAction(await requestCtx(req), puzzleParam(req, body));
   const res = NextResponse.json(result.body ?? {}, { status: result.status });
   if (result.sessionToken) ensureToken(res, result.sessionToken);
   return res;

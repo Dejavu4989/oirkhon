@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import GameBoard from "./GameBoard";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function OirkhonPage() {
-  return <GameBoard />;
+  return (
+    <Suspense fallback={null}>
+      <GameBoard />
+    </Suspense>
+  );
 }
