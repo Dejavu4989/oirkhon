@@ -21,6 +21,7 @@ interface BoardData {
   vocab_size: number;
   answer: string | null;
   nearest: { word: string; rank: number }[] | null;
+  giveup_after: number;
 }
 
 /** One line on the board. */
@@ -29,8 +30,6 @@ interface Row { word: string; rank: number; fromHint: boolean; isAnswer: boolean
 const BAR: Record<string, string> = {
   solved: "bg-hot", hot: "bg-hot", warm: "bg-warm", cool: "bg-cold", cold: "bg-cold",
 };
-
-const GIVEUP_AFTER = 1;
 
 export default function GameBoard() {
   const params = useSearchParams();
@@ -71,6 +70,7 @@ export default function GameBoard() {
   const hintsUsed = data?.hints_used ?? 0;
   const hintsAllowed = data?.hints_allowed ?? 3;
   const hintsLeft = Math.max(hintsAllowed - hintsUsed, 0);
+  const giveupAfter = data?.giveup_after ?? 10;   // the server decides; this is only a fallback
 
   // Guesses and hint-revealed words share one ranked list. Once the game is
   // over the answer sits at the very top, whether it was solved or given up —
@@ -267,13 +267,13 @@ export default function GameBoard() {
             <div className="fixed inset-0 z-10" onClick={() => setMenu(false)} />
             <div className="absolute right-0 top-14 z-20 w-60 overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-xl">
               <button onClick={() => void giveUp()}
-                      // disabled={finished || guessCount < GIVEUP_AFTER}
+                      // disabled={finished || guessCount < giveupAfter}
                       className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-surface2 disabled:opacity-40">
                 <IconFlag className="h-4 w-4 shrink-0" />
                 Бууж өгөх
-                {guessCount < GIVEUP_AFTER && (
+                {guessCount < giveupAfter && (
                   <span className="ml-auto text-[12px] text-muted">
-                    {GIVEUP_AFTER - guessCount} үлдсэн
+                    {giveupAfter - guessCount} үлдсэн
                   </span>
                 )}
               </button>

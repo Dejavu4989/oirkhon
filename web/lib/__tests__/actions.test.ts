@@ -325,8 +325,14 @@ describe("hintAction", () => {
 });
 
 describe("giveupAction", () => {
-  it("409 before 20 guesses", () => {
-    expect(giveupAction(anon("g0")).status).toBe(409);
+  it("refused with nine guesses, allowed with ten", () => {
+    for (const w of FILLERS.slice(0, 9)) guessAction(anon("g0"), w);
+    const early = giveupAction(anon("g0"));
+    expect(early.status).toBe(409);
+    expect(early.body.need).toBe(1);
+    guessAction(anon("g0"), FILLERS[9]);
+    expect(giveupAction(anon("g0")).status).toBe(200);
+    expect(boardPayload(anon("g0")).body.giveup_after).toBe(10);
   });
 
   it("after 20 guesses reveals answer + nearest list", () => {

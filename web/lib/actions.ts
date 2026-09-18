@@ -10,7 +10,7 @@ import {
 import { recordUnknown } from "./unknown";
 
 export const GAME_SLUG = "oirkhon";
-const GIVEUP_AFTER = 20;
+export const GIVEUP_AFTER = 10;
 /** How many words a guess is ranked among — the playable set, not the whole lexicon. */
 export const VOCAB_SIZE = () => getLexicon().playableSize;
 
@@ -156,6 +156,7 @@ export interface BoardBody {
   vocab_size?: number;
   answer?: string | null;
   nearest?: { word: string; rank: number }[] | null;
+  giveup_after?: number;
   status?: string;
   error?: string;
 }
@@ -179,6 +180,7 @@ export function boardPayload(ctx: Ctx, n?: number):
       is_archive: isArchive,
       ...publicPlay(play),
       hints_allowed: hintAllowance(ctx.viewer),
+      giveup_after: GIVEUP_AFTER,
       vocab_size: VOCAB_SIZE(),
       // Only ever after solve or give-up [LOCKED spec §2].
       answer: finished ? puzzle.answer : null,
