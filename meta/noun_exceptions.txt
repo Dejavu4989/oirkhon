@@ -1,0 +1,29 @@
+# Always playable, one per line. Overrides every rule in pipeline/playable.py.
+# Add a word here when `python -m pipeline.playable --why WORD` drops a real
+# noun — typically a homonym of a verb form or of an inflected form.
+түүх
+шүүх
+эмэгтэй
+эрэгтэй
+монгол
+болд
+зурагт
+гэрээ
+хороо
+эрдэнэ
+элч
+төлөв
+элдэв
+хүнд
+тайван
+нисэх
+дараах
+алтан
+мөнгөн
+хойд
+дээд
+дэд
+ард
+хаан
+уран
+хамт

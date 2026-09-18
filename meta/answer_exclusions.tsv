@@ -1,0 +1,7 @@
+# Per-answer exclusions: words that fastText puts close to an answer for the
+# wrong sense. One pair per line: answer<TAB>word. Excluded words are ranked
+# at the very bottom for that puzzle and are never offered as hints.
+# Review each answer with:
+#   python -m pipeline.inspect WORD --vectors data/vectors/fasttext_mn.npz
+харш	харшил
+харш	харшлах

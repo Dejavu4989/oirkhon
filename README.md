@@ -19,7 +19,10 @@ pipeline/               Phase 0 Python package (stdlib-only core)
   corpus/               wiki / cc100 / news collectors
   vocab.py              token counting, top-forms, lemma reduction
   forms.py              word_forms dictionary builder (dictionary-first)
+  playable.py           what is fit to play with: rank space, hints, answer eligibility
   candidates.py         answer-candidate generation (admin reviews; never auto)
+  schedule.py           draft schedule; --from N protects played puzzles
+  export_web.py         runtime artifact for the web app (format 2)
   embeddings/           fastText cc.mn.300, e5-large, LaBSE, ensemble
   ranks.py              rank precomputation -> Postgres puzzle_ranks + Redis
   inspect.py            quality-gate CLI: python -m pipeline.inspect <word>
@@ -66,7 +69,7 @@ python -m pipeline.inspect морь --vectors data/vectors/fasttext_mn.npz data/
 ## Roadmap (spec §11)
 
 1. `/pipeline` — corpus, vocabulary, morphology + tests, embeddings, inspect CLI ✅ (code)
-2. Quality gate §3.6 — **pending: needs real embeddings + your review with a Mongolian speaker**
+2. Quality gate §3.6 ✅ — re-gated 2026-09-18 on playable words only; fastText still wins (meta/GATE_VERDICT.md)
 3. Schema + migrations + rank job + 30 days of approved answers (schema SQL ready)
 4. API routes with tests
 5. Game UI, anonymous play, share text

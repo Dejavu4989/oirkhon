@@ -17,10 +17,13 @@ corpus → vocabulary → morphology → embeddings → ranks. The core
 | `corpus/news.py` | robots.txt-respecting crawler skeleton; configure sites after legal review |
 | `vocab.py` | Top-40k forms → lemma reduction by frequency margin (`ноход→нохой` merges; `багана↛бага`) |
 | `forms.py` | Unambiguous form→lemma dictionary (+ curated `meta/manual_merges.tsv` overrides) |
-| `candidates.py` | Answer candidates 3–9 letters, difficulty bands, Mondays=easy — **review only, never auto-approved** |
+| `playable.py` | **What is fit to play with.** Playable words (rank space, hints) vs answer-eligible (stricter). Rule-based, vocabulary-checked; `--audit` / `--why` CLIs. Curated overrides in `meta/` |
+| `candidates.py` | Answer candidates via `playable.answer_eligible` + citation-form check, difficulty by frequency band — **review only, never auto-approved** |
+| `schedule.py` | Draft schedule; `--from N` keeps played puzzles verbatim; `--swap` replaces ineligible drafts; `--audit` |
+| `export_web.py` | Runtime artifact for the app: ranks every lemma among the playable words (format 2, compact arrays), applies `meta/answer_exclusions.tsv` |
 | `embeddings/` | fastText cc.mn.300 / e5-large / LaBSE + concat & rank-average ensemble |
 | `ranks.py` | Full ranked list per puzzle → Postgres `puzzle_ranks` + Redis `ranks:{id}` |
-| `inspect.py` | Quality-gate CLI (below) |
+| `inspect.py` | Quality-gate CLI: neighbours among playable words, `--all` for raw model output with reasons |
 | `gameutil.py` | Rank buckets, log progress bar, share-text builder |
 
 ## Curated lists (committed under `/meta`)
@@ -29,6 +32,10 @@ corpus → vocabulary → morphology → embeddings → ranks. The core
 - `manual_merges.tsv` — form⇥lemma overrides for cases statistics get wrong
   (мориноор→морь: poetic морин outnumbers морь on Wikipedia).
 - `blocklist.txt` — excluded from answer candidates.
+- `noun_exceptions.txt` — always playable; for real nouns a rule would drop
+  (homonyms of verb forms: түүх, шүүх; lexicalised case forms: хүнд, зурагт).
+- `answer_exclusions.tsv` — answer⇥word pairs where fastText is close for the
+  wrong sense (харш→харшил); ranked last for that puzzle, never a hint.
 
 These are admin-maintained; extend them as the unknown-word queue surfaces issues.
 
@@ -45,6 +52,7 @@ python -m pipeline.corpus.cc100 --max-lines 20000000        # ~1GB xz stream
 #                          16,449 word_forms mappings)
 python -m pipeline.vocab
 python -m pipeline.forms
+python -m pipeline.playable --audit    # what the rules keep: ~9k playable, ~1.2k answer-eligible
 python -m pipeline.candidates
 
 # 3. embeddings (pip install -r requirements.txt first)
@@ -59,7 +67,12 @@ python -m pipeline.inspect морь --vectors data/vectors/*.npz --top 50
 #           өвөл хайр ажил нар гэр эмч мод дуу
 #    All 20 are confirmed present in the current vocabulary.
 
-# 5. DB + ranks (after schema apply and puzzle scheduling)
+# 5. schedule + export for the web app
+python -m pipeline.schedule --from <today's puzzle #> --days 90
+python -m pipeline.schedule --audit
+python -m pipeline.export_web
+
+# 6. DB + ranks (after schema apply and puzzle scheduling)
 python -m pipeline.db apply-schema
 python -m pipeline.db upsert-lemmas data/vocab/lemmas.tsv
 python -m pipeline.db upsert-word-forms data/vocab/word_forms.jsonl
@@ -83,4 +96,12 @@ python -m pipeline.ranks --vectors <best>.npz --answer морь --puzzle-id 1 \
 - POS tags are heuristic (-х ⇒ verb); refine against a dictionary later or in
   the admin panel.
 - Wiki-only vocab is 22.4k lemmas; CC-100 + news will lift it toward 25–30k.
+  Wiki is also why proper nouns are 29% of the vocabulary and why loanwords
+  (статик, блокчэйн) reach the frequency floor — the playable filter handles
+  them, but a wider corpus is the real fix.
+- Two-meaning words (харш palace / allergy) share one fastText vector. The
+  verb/noun split removes most cases; the rest is `meta/answer_exclusions.tsv`.
+- The wiki reader used to keep the text of `[[Ангилал:…]]` category links,
+  which made "ангилал" the second most frequent "word". Fixed in
+  `textnorm.strip_wiki_markup`; takes effect on the next corpus run.
 - морин/морь-class poetic variants are decided by curated manual merges.

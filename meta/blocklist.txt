@@ -48,3 +48,10 @@
 болой
 өнгөрдөг
 эгнээнд
+
+# wiki markup leak: the Category: namespace, not a word people use
+ангилал
+нацист
+фашист
+нацизм
+фашизм

@@ -56,6 +56,12 @@ _REF_RE = re.compile(r"<ref[^>]*/>|<ref[^>]*>.*?</ref>", re.DOTALL | re.IGNORECA
 _TABLE_RE = re.compile(r"\{\|.*?\|\}", re.DOTALL)
 _TAG_RE = re.compile(r"</?[a-z][^>]*>", re.IGNORECASE)
 _WIKILINK_RE = re.compile(r"\[\[(?:[^\[\]|]*\|)?([^\[\]|]*)\]\]")
+# [[Ангилал:Foo]] / [[Category:Foo]] links must vanish entirely: keeping their
+# text is what made "ангилал" the second most frequent "word" in the corpus.
+_NS_LINK_RE = re.compile(
+    r"\[\[\s*(?:Ангилал|Category|Файл|Зураг|File|Image|Загвар|Template)\s*:[^\[\]]*\]\]",
+    re.IGNORECASE,
+)
 _EXT_LINK_RE = re.compile(r"\[(?:https?://|mailto:)[^\s\]]+(?:\s+([^\]]+))?\]")
 _HEADING_RE = re.compile(r"^=+\s*(.*?)\s*=+$", re.MULTILINE)
 _BOLD_RE = re.compile(r"'{2,5}")
@@ -73,6 +79,7 @@ def strip_wiki_markup(text: str) -> str:
             break
         text = new
     text = _TABLE_RE.sub(" ", text)
+    text = _NS_LINK_RE.sub(" ", text)
     text = _WIKILINK_RE.sub(r"\1", text)
     text = _EXT_LINK_RE.sub(r"\1", text)
     text = _TAG_RE.sub(" ", text)

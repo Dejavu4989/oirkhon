@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   activityPayload, archiveList, boardPayload, findPuzzle, giveupAction,
-  guessAction, hintAction, HINTS_FREE, HINTS_SUBSCRIBER, ubDate, type Ctx,
+  guessAction, hintAction, HINTS_FREE, HINTS_SUBSCRIBER, sharesStem, ubDate, type Ctx,
 } from "../actions";
 import type { Viewer } from "../auth";
 import { setExport, type ExportShape } from "../lexicon";
@@ -376,6 +376,75 @@ describe("activity [#5]", () => {
     const days = activityPayload(anon("a1"), 7);
     expect(days[days.length - 1].played).toBe(true);
     expect(days.slice(0, -1).every((d) => !d.played)).toBe(true);
+  });
+});
+
+describe("playable rank space", () => {
+  function clone(): ExportShape {
+    return JSON.parse(JSON.stringify(FIXTURE));
+  }
+
+  it("format-2 array ranks resolve per lemma", () => {
+    const shape = clone();
+    const idx = Object.fromEntries(shape.lemmas.map(([w], i) => [w, i]));
+    const arr = new Array(shape.lemmas.length).fill(9999);
+    for (const [w, r] of Object.entries(shape.ranks["2"] as Record<string, number>)) arr[idx[w]] = r;
+    shape.ranks["2"] = arr;
+    shape.format = 2;
+    setExport(shape);
+    expect(guessAction(anon(), "нохой").body.rank).toBe(2);
+    expect(guessAction(anon(), "гэр").body.rank).toBe(300);
+    expect(boardPayload(anon()).body.vocab_size).toBe(shape.lemmas.length);
+  });
+
+  it("hints and the give-up list only use playable words", () => {
+    const shape = clone();
+    shape.playable = ["морь", "нохой", "ном", "хот", "гэр"];   // none of the fillers
+    setExport(shape);
+    expect(boardPayload(anon()).body.vocab_size).toBe(5);
+
+    guessAction(anon("pl"), "гэр");            // 300 -> target 150; best playable <= 150 is хот
+    expect(hintAction(anon("pl")).body.word).toBe("хот");
+
+    for (const w of FILLERS.concat(["гэр"])) guessAction(anon("pl2"), w);
+    const g = giveupAction(anon("pl2"));
+    expect(g.body.nearest!.length).toBeGreaterThan(0);
+    expect(g.body.nearest!.every((x) => shape.playable!.includes(x.word))).toBe(true);
+  });
+
+  it("a non-playable word is still guessable and ranked", () => {
+    const shape = clone();
+    shape.playable = ["морь", "нохой", "ном"];
+    setExport(shape);
+    const r = guessAction(anon(), "хот");        // хот is not playable here
+    expect(r.status).toBe(200);
+    expect(r.body.rank).toBe(15);
+  });
+
+  it("a hint never shares the answer's stem", () => {
+    const shape = clone();
+    shape.lemmas.push(["морин", 100]);
+    (shape.ranks["2"] as Record<string, number>)["морин"] = 2;
+    (shape.ranks["2"] as Record<string, number>)["нохой"] = 3;
+    setExport(shape);
+    guessAction(anon("st"), "дүр2");            // rank 4 -> target 2 -> only морин qualifies
+    const h = hintAction(anon("st"));
+    expect(h.body.word).not.toBe("морин");
+    expect(h.status).toBe(409);
+    expect(h.body.status).toBe("no_closer");
+  });
+});
+
+describe("sharesStem", () => {
+  it("folds the ь/и alternation and needs at least three letters", () => {
+    expect(sharesStem("морь", "морин")).toBe(true);
+    expect(sharesStem("морь", "морины")).toBe(true);
+    expect(sharesStem("ном", "номын")).toBe(true);
+    expect(sharesStem("хот", "хотхон")).toBe(true);
+    expect(sharesStem("морь", "морж")).toBe(false);     // four letters compared: мори vs морж
+    expect(sharesStem("сургууль", "сурах")).toBe(false);
+    expect(sharesStem("ус", "усны")).toBe(false);       // too short to judge
+    expect(sharesStem("гэр", "гэр")).toBe(false);
   });
 });
 

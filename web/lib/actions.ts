@@ -2,7 +2,7 @@
 // appear in any client-facing payload before solve/give-up [LOCKED spec §2].
 import type { Viewer } from "./auth";
 import { bucketForRank, bucketLabel, progressFill } from "./game";
-import { getLexicon, loadExport, type ScheduleEntry } from "./lexicon";
+import { getLexicon, loadExport, rankMap, type ScheduleEntry } from "./lexicon";
 import { allowHit, resetLimits } from "./ratelimit";
 import {
   getOrCreatePlay, getSession, newSessionToken, savePlay, userKey, type PlayState,
@@ -11,7 +11,8 @@ import { recordUnknown } from "./unknown";
 
 export const GAME_SLUG = "oirkhon";
 const GIVEUP_AFTER = 20;
-export const VOCAB_SIZE = () => getLexicon().size;
+/** How many words a guess is ranked among — the playable set, not the whole lexicon. */
+export const VOCAB_SIZE = () => getLexicon().playableSize;
 
 /** Free players get three hints a day; subscribers get more [#8]. */
 export const HINTS_FREE = 3;
@@ -71,16 +72,30 @@ export function findPuzzleByNumber(n: number): ScheduleEntry | null {
 }
 
 function ranksFor(n: number): Record<string, number> {
-  return loadExport().ranks[String(n)] ?? {};
+  return rankMap(n);
 }
 
-/** Closest words to the answer, excluding the answer itself. */
+/**
+ * Two words that share their first letters are, for a hint, the same word.
+ * Compared after folding ь to и, because stems alternate between the two
+ * (морь / морин / морины) — the one case a hint must never leak.
+ */
+export function sharesStem(a: string, b: string): boolean {
+  if (a === b) return false;
+  const x = a.replace(/ь/g, "и");
+  const y = b.replace(/ь/g, "и");
+  const n = Math.min(4, x.length, y.length);
+  return n >= 3 && x.slice(0, n) === y.slice(0, n);
+}
+
+/** Closest playable words to the answer, excluding the answer itself. */
 function nearestWords(puzzleNumber: number, answer: string, limit = 10) {
-  return Object.entries(ranksFor(puzzleNumber))
-    .filter(([lemma]) => lemma !== answer)
-    .sort((a, b) => a[1] - b[1])
-    .slice(0, limit)
-    .map(([word, rank]) => ({ word, rank }));
+  const ranks = ranksFor(puzzleNumber);
+  return getLexicon().playable
+    .filter((lemma) => lemma !== answer && ranks[lemma] !== undefined)
+    .map((word) => ({ word, rank: ranks[word] }))
+    .sort((a, b) => a.rank - b.rank)
+    .slice(0, limit);
 }
 
 // ---- which puzzle -------------------------------------------------------------
@@ -400,10 +415,14 @@ export function hintAction(ctx: Ctx, n?: number):
   // landing on rank 1 — the answer must stay server-side [LOCKED spec §2].
   const target = Math.max(2, Math.floor(best / 2));
   const seen = revealedWords(play);
+  const ranks = ranksFor(puzzle.n);
   let pickWord: { word: string; rank: number } | null = null;
-  for (const [lemma, rank] of Object.entries(ranksFor(puzzle.n))) {
-    if (rank < 2 || rank > target) continue;      // rank 1 is the answer
-    if (seen.has(lemma)) continue;
+  // Only playable words are offered (never a verb form or an inflection), and
+  // never one that shares the answer's stem — that would hand over the answer.
+  for (const lemma of getLexicon().playable) {
+    const rank = ranks[lemma];
+    if (rank === undefined || rank < 2 || rank > target) continue;   // rank 1 is the answer
+    if (seen.has(lemma) || sharesStem(lemma, puzzle.answer)) continue;
     if (!pickWord || rank > pickWord.rank) pickWord = { word: lemma, rank };
   }
   if (!pickWord) {

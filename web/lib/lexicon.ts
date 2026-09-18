@@ -12,13 +12,24 @@ export interface ScheduleEntry {
 }
 
 export interface ExportShape {
+  format?: number;
   schedule: ScheduleEntry[];
   lemmas: [string, number][];
   forms: Record<string, string>;
-  ranks: Record<string, Record<string, number>>;
+  /**
+   * The rank space: words fit to be hints and neighbours (pipeline.playable).
+   * Absent in format-1 exports, where every lemma counts.
+   */
+  playable?: string[];
+  /**
+   * format 2: one rank per lemma, aligned with `lemmas` (compact).
+   * format 1: {lemma: rank}.
+   */
+  ranks: Record<string, number[] | Record<string, number>>;
 }
 
 let cached: ExportShape | null = null;
+let rankCache = new Map<string, Record<string, number>>();
 
 function exportPath(): string {
   const env = process.env.OIRKHON_EXPORT;
@@ -36,18 +47,38 @@ export function loadExport(): ExportShape {
   const json = buf[0] === 0x1f && buf[1] === 0x8b
     ? gunzipSync(buf).toString("utf-8")     // pipeline exports gzip (export_web.py)
     : buf.toString("utf-8");
-  const raw = JSON.parse(json) as ExportShape;
-  cached = raw;
-  return raw;
+  cached = JSON.parse(json) as ExportShape;
+  return cached;
 }
 
 /** test hook */
 export function setExport(shape: ExportShape | null): void {
   cached = shape;
+  rankCache = new Map();
+}
+
+/** Rank of every lemma for puzzle `n`, whichever export format wrote it. */
+export function rankMap(n: number): Record<string, number> {
+  const key = String(n);
+  const hit = rankCache.get(key);
+  if (hit) return hit;
+  const exp = loadExport();
+  const raw = exp.ranks[key];
+  let map: Record<string, number> = {};
+  if (Array.isArray(raw)) {
+    exp.lemmas.forEach(([w], i) => { map[w] = raw[i]; });
+  } else if (raw) {
+    map = raw;
+  }
+  rankCache.set(key, map);
+  return map;
 }
 
 export class Lexicon {
   readonly vocab: Set<string>;
+  /** Words that may be hints or neighbours — the space guesses are ranked in. */
+  readonly playable: string[];
+  readonly playableSet: Set<string>;
   private readonly freq: Map<string, number> = new Map();
   private readonly surfaces: Map<string, string> = new Map(); // known surface -> lemma
 
@@ -56,10 +87,17 @@ export class Lexicon {
     for (const [w, f] of exp.lemmas) this.freq.set(w, f);
     for (const [w] of exp.lemmas) this.surfaces.set(w, w);
     for (const [form, lemma] of Object.entries(exp.forms)) this.surfaces.set(form, lemma);
+    this.playable = exp.playable ?? exp.lemmas.map(([w]) => w);
+    this.playableSet = new Set(this.playable);
   }
 
   get size(): number {
     return this.vocab.size;
+  }
+
+  /** How many words a guess is ranked among. */
+  get playableSize(): number {
+    return this.playable.length;
   }
 
   /** Dictionary-first, then identity — rules live in the exported word_forms map. */

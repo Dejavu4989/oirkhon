@@ -30,7 +30,7 @@ const BAR: Record<string, string> = {
   solved: "bg-hot", hot: "bg-hot", warm: "bg-warm", cool: "bg-cold", cold: "bg-cold",
 };
 
-const GIVEUP_AFTER = 20;
+const GIVEUP_AFTER = 1;
 
 export default function GameBoard() {
   const params = useSearchParams();
@@ -267,7 +267,7 @@ export default function GameBoard() {
             <div className="fixed inset-0 z-10" onClick={() => setMenu(false)} />
             <div className="absolute right-0 top-14 z-20 w-60 overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-xl">
               <button onClick={() => void giveUp()}
-                      disabled={finished || guessCount < GIVEUP_AFTER}
+                      // disabled={finished || guessCount < GIVEUP_AFTER}
                       className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-surface2 disabled:opacity-40">
                 <IconFlag className="h-4 w-4 shrink-0" />
                 Бууж өгөх
